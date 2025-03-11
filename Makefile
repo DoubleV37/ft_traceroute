@@ -5,7 +5,8 @@ NAME = ft_traceroute
 SRC =	srcs/main.c \
 		srcs/traceroute.c \
 		srcs/traceroute_utils.c \
-		srcs/parsing.c
+		srcs/parsing.c \
+		srcs/commands.c
 
 RM = rm -rf
 
