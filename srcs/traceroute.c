@@ -156,24 +156,10 @@ int send_pings(ping *ping) {
     return 0;
 }
 
-int	handle_ping_reply(ping *ping, int seq, int type_reply) {
-	if (type_reply == ICMP_ECHO)
-		return 0;
-	if (type_reply == ICMP_TIME_EXCEEDED) {
-		ping_pckt *tmp;
-		for (int i = seq - 2; i <= seq; i++) {
-			tmp = find_ping(ping->pings, i);
-			if (!tmp) {
-				printf("No matching ping found\n");
-				return 0;
-			}
-			printf(" %.2f ms", time_diff(tmp->sent_time, tmp->recv_time));
-		}
+void	print_ping_delay(ping_pckt *pckt, int cpt) {
+		printf(" %.2f ms", time_diff(pckt->sent_time, pckt->recv_time));
+	if (cpt == 2)
 		printf("\n");
-		free_ping(ping->pings);
-		ping->pings = NULL;
-	}
-	return 0;
 }
 
 int recv_pings(ping *ping) {
@@ -186,6 +172,8 @@ int recv_pings(ping *ping) {
 	struct timeval tv;
 	ssize_t recv_len;
 	int type_reply;
+	int ip_hdr_len = sizeof(struct ip);
+	int icmp_hdr_len = sizeof(struct icmphdr);
 
 	while (cpt < 3) {
 		recv_len = recvfrom(ping->socks.recv, recv_buffer, sizeof(recv_buffer), 0, (struct sockaddr*)&src_addr, &addr_len);
@@ -200,29 +188,44 @@ int recv_pings(ping *ping) {
 			continue;
 		}
 		if (recv_len <= 0) {
+			free_ping(ping->pings);
+			ping->pings = NULL;
 			perror("Recvfrom failed");
 			return 1;
 		}
 		ip_hdr = (struct ip *)recv_buffer;
-		icmp_reply = (struct icmphdr *)(recv_buffer + ip_hdr->ip_hl * 4);
+		icmp_reply = (struct icmphdr *)(recv_buffer + ip_hdr_len);
 		type_reply = icmp_reply->type;
+		gettimeofday(&tv, NULL);
 		if (cpt == 0)
 			printf(" %s (%s)", inet_ntoa(ip_hdr->ip_src), inet_ntoa(ip_hdr->ip_src));
 		if (type_reply == ICMP_TIME_EXCEEDED) {
-			ip_hdr = (struct ip *)(recv_buffer + ip_hdr->ip_hl * 4 + 8);
-			icmp_reply = (struct icmphdr *)(recv_buffer + ip_hdr->ip_hl * 4 + 8 + ip_hdr->ip_hl * 4);
+			ip_hdr = (struct ip *)(recv_buffer + ip_hdr_len + icmp_hdr_len);
+			icmp_reply = (struct icmphdr *)(recv_buffer + ip_hdr_len * 2 + icmp_hdr_len);
 			ping_pckt *ping_target = find_ping(ping->pings, icmp_reply->un.echo.sequence);
 			if (!ping_target){
 				printf("No matching ping found\n");
 				return 0;
 			}
 			ping_target->ip_addr = inet_ntoa(src_addr.sin_addr);
-			gettimeofday(&tv, NULL);
 			ping_target->recv_time = tv;
+			print_ping_delay(ping_target, cpt);
+		}
+		else if (type_reply == ICMP_ECHOREPLY) {
+			ping_pckt *ping_target = find_ping(ping->pings, icmp_reply->un.echo.sequence);
+			if (!ping_target){
+				printf("No matching ping found\n");
+				return 0;
+			}
+			ping_target->ip_addr = inet_ntoa(src_addr.sin_addr);
+			ping_target->recv_time = tv;
+			print_ping_delay(ping_target, cpt);
+			if (cpt == 2)
+				return 1;
 		}
 		cpt++;
 	}
-	return (handle_ping_reply(ping, icmp_reply->un.echo.sequence, type_reply));
+	return 0;
 }
 
 void print_first_line(ping *ping) {
@@ -257,10 +260,10 @@ void end_ping(ping *ping) {
 	ping->socks.recv = -1;
 	close(ping->socks.send);
 	ping->socks.send = -1;
-	free_ping(ping->pings);
-	ping->pings = NULL;
 	free(ping->params.data);
 	ping->params.data = NULL;
+	free_ping(ping->pings);
+	ping->pings = NULL;
 }
 
 int cmd_traceroute(ping *ping) {
@@ -271,7 +274,6 @@ int cmd_traceroute(ping *ping) {
 		if (recv_pings(ping) == 1)
 			return 0;
 		ping->params.ttl++;
-
 	}
 	return 1;
 }

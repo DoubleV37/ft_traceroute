@@ -49,14 +49,12 @@ int parsing(int argc, char **argv)
 		{
 			printf("ft_traceroute: unknown host\n");
 			free(ping.params.raw_dest);
-			free(ping.params.ip_addr_src);
 			return (1);
 		}
 		if (initial_setup_traceroute(&ping))
 		{
 			printf("ft_traceroute: error while setting up ping\n");
 			free(ping.params.raw_dest);
-			free(ping.params.ip_addr_src);
 			return (1);
 		}
 		return_val = cmd_traceroute(&ping);
@@ -64,16 +62,15 @@ int parsing(int argc, char **argv)
 		if (return_val == 0)
 		{
 			free(ping.params.raw_dest);
-			free(ping.params.ip_addr_src);
 			return (0);
 		}
 		free(ping.params.raw_dest);
-		// free(ping.params.ip_addr_src);
 	}
 	else
 	{
-		printf("ft_ping: missing host operand\n");
+		printf("ft_ traceroute: missing host operand\n");
 		printf("Try 'ft_ping --help' for more information.\n");
+		free(ping.params.raw_dest);
 		return (1);
 	}
 	return (0);
