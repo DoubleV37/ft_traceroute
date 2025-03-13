@@ -50,6 +50,7 @@ typedef struct s_params{
 	int max_ttl;
 	struct s_ping_data *data;
 	u_int16_t seq;
+	int type_traceroute;
 } params;
 
 typedef struct s_ping{
@@ -70,16 +71,24 @@ double	time_diff(struct timeval start, struct timeval end);
 float	ft_sqrt(float number);
 unsigned	short checksum(void *b, int len);
 char *clean_argv(char *argv);
-void	initial_init_ping(ping *ping);
+void	initial_init_traceroute(ping *ping);
 
 // parsing.c
 int	parsing(int argc, char **argv);
 
-// ping.c
+// traceroute.c
 int	cmd_traceroute(ping *ping);
 int	initial_setup_traceroute(ping *ping);
-void	end_ping(ping *ping);
 char	*get_source_ip();
 int	get_ip_with_hostname(char *hostname, char final_ip[INET_ADDRSTRLEN]);
+
+// ping_utils.c
+int create_socket_send(void);
+ping_data *build_ping_data(ping *ping);
+void update_ping_data(ping_data *data, ping *ping);
+int send_pings(ping *ping);
+void print_ping_delay(ping_pckt *pckt, int cpt);
+int recv_pings(ping *ping);
+void	end_ping(ping *ping);
 
 #endif

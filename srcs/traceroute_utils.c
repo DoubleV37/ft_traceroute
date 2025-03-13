@@ -97,7 +97,7 @@ char *clean_argv(char *argv)
 	return (argvclean);
 }
 
-void initial_init_ping(ping *ping)
+void initial_init_traceroute(ping *ping)
 {
 	ping->pings = NULL;
 	ping->socks.recv = -1;
@@ -107,4 +107,5 @@ void initial_init_ping(ping *ping)
 	ping->params.ip_addr_src = NULL;
 	ping->params.raw_dest = NULL;
 	ping->params.ip_addr_dest[0] = '\0';
+	ping->params.type_traceroute = 0;
 }

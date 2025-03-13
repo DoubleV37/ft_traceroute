@@ -6,7 +6,8 @@ SRC =	srcs/main.c \
 		srcs/traceroute.c \
 		srcs/traceroute_utils.c \
 		srcs/parsing.c \
-		srcs/commands.c
+		srcs/commands.c \
+		srcs/ping_utils.c
 
 RM = rm -rf
 

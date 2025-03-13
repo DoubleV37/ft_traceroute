@@ -12,7 +12,7 @@ int parsing(int argc, char **argv)
 		return (1);
 	}
 	ping ping;
-	initial_init_ping(&ping);
+	initial_init_traceroute(&ping);
 	while (i < argc)
 	{
 		if (argv[i][0] != '-')
@@ -21,16 +21,26 @@ int parsing(int argc, char **argv)
 			i++;
 			continue;
 		}
-		// else if (strcmp(argv[i], "-?") == 0 || strcmp(argv[i], "--help") == 0)
-		// {
-		// 	free(ping.params.raw_dest);
-		// 	return (cmd_help());
-		// }
-		// else if (strcmp(argv[i], "-V") == 0 || strcmp(argv[i], "--version") == 0)
-		// {
-		// 	free(ping.params.raw_dest);
-		// 	return (cmd_version());
-		// }
+		else if (strcmp(argv[i], "--help") == 0)
+		{
+			free(ping.params.raw_dest);
+			return (cmd_help());
+		}
+		else if (strcmp(argv[i], "-V") == 0 || strcmp(argv[i], "--version") == 0)
+		{
+			free(ping.params.raw_dest);
+			return (cmd_version());
+		}
+		else if (strcmp(argv[i], "-I") == 0 || strcmp(argv[i], "--icmp") == 0)
+		{
+			ping.params.type_traceroute = 1;
+			if (getgid() != 0)
+			{
+				printf("You do not have enough privileges to use this traceroute method.\n");
+				free(ping.params.raw_dest);
+				return (1);
+			}
+		}
 		else
 		{
 			cmd = clean_argv(argv[i]);
