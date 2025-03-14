@@ -1,7 +1,9 @@
 #include "../ft_traceroute.h"
 
-int create_socket_send(void) {
+int create_socket_send_icmp(void) {
 	int sock;
+	printf("Failed to create sodddsdcket\n");
+
 
 	sock = socket(AF_INET, SOCK_RAW, IPPROTO_RAW);
 	if (sock < 0) {

@@ -48,6 +48,21 @@ char	*get_source_ip() {
 	return (NULL);
 }
 
+
+int create_socket_send_udp(void) {
+    int sock;
+	printf("Failed to create socket\n");
+
+
+    sock = socket(AF_INET, SOCK_DGRAM, 0);
+    if (sock < 0) {
+        fprintf(stderr, "Socket error: %s\n", strerror(errno));
+        return -1;
+    }
+
+    return sock;
+}
+
 int	create_socket_recv()
 {
 	int	sock;
@@ -77,10 +92,12 @@ void print_first_line(ping *ping) {
 
 int initial_setup_traceroute(ping *ping) {
 	ping->socks.recv = create_socket_recv();
-	if (ping->socks.recv < 0) {
+	if (ping->socks.recv < 0)
 		return 1;
-	}
-	ping->socks.send = create_socket_send();
+	if (ping->params.type_traceroute == 1)
+		ping->socks.send = create_socket_send_icmp();
+	else
+		ping->socks.send = create_socket_send_udp();
 	if (ping->socks.send < 0) {
 		close(ping->socks.recv);
 		return 1;
@@ -99,7 +116,6 @@ int initial_setup_traceroute(ping *ping) {
 }
 
 int cmd_traceroute(ping *ping) {
-
 	while (g_run && ping->params.ttl <= ping->params.max_ttl) {
 		printf("%d : ", ping->params.ttl);
 		if (ping->params.type_traceroute == 0) {

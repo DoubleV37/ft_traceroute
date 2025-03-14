@@ -83,7 +83,7 @@ char	*get_source_ip();
 int	get_ip_with_hostname(char *hostname, char final_ip[INET_ADDRSTRLEN]);
 
 // ping_utils.c
-int create_socket_send(void);
+int create_socket_send_icmp(void);
 ping_data *build_ping_data(ping *ping);
 void update_ping_data(ping_data *data, ping *ping);
 int send_pings(ping *ping);
