@@ -51,19 +51,46 @@ char	*get_source_ip() {
 
 int create_socket_send_udp(void) {
     int sock;
-	printf("Failed to create socket\n");
-
-
     sock = socket(AF_INET, SOCK_DGRAM, 0);
     if (sock < 0) {
         fprintf(stderr, "Socket error: %s\n", strerror(errno));
         return -1;
     }
-
     return sock;
 }
 
-int	create_socket_recv()
+int create_socket_recv_udp(int port) {
+    int sock;
+    struct sockaddr_in server_addr;
+
+    sock = socket(AF_INET, SOCK_DGRAM, 0);
+    if (sock < 0) {
+        perror("socket error");
+        return -1;
+    }
+
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = INADDR_ANY;
+    server_addr.sin_port = htons(port);
+
+    if (bind(sock, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
+        perror("bind error");
+        close(sock);
+        return -1;
+    }
+    struct timeval timeout;
+    timeout.tv_sec = 3;
+    timeout.tv_usec = 0;
+    if (setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) < 0) {
+        perror("setsockopt error");
+        close(sock);
+        return -1;
+    }
+    return sock;
+}
+
+int	create_socket_recv_icmp()
 {
 	int	sock;
 	struct timeval timeout;
@@ -91,13 +118,18 @@ void print_first_line(ping *ping) {
 }
 
 int initial_setup_traceroute(ping *ping) {
-	ping->socks.recv = create_socket_recv();
-	if (ping->socks.recv < 0)
-		return 1;
-	if (ping->params.type_traceroute == 1)
+	if (ping->params.type_traceroute == 1) {
+		ping->socks.recv = create_socket_recv_icmp();
+		if (ping->socks.recv < 0)
+			return 1;
 		ping->socks.send = create_socket_send_icmp();
-	else
+	}
+	else {
+		ping->socks.recv = create_socket_recv_udp(33434);
+		if (ping->socks.recv < 0)
+			return 1;
 		ping->socks.send = create_socket_send_udp();
+	}
 	if (ping->socks.send < 0) {
 		close(ping->socks.recv);
 		return 1;
@@ -115,12 +147,34 @@ int initial_setup_traceroute(ping *ping) {
 	return 0;
 }
 
+int send_udp_pckt(ping *ping) {
+	setsockopt(ping->socks.send, IPPROTO_IP, IP_TTL, &ping->params.ttl, sizeof(int));
+	struct sockaddr_in dest_addr;
+	memset(&dest_addr, 0, sizeof(dest_addr));
+	dest_addr.sin_family = AF_INET;
+	dest_addr.sin_addr.s_addr = inet_addr(ping->params.ip_addr_dest);
+	dest_addr.sin_port = htons(33434);
+	size_t packet_size = sizeof(ping_data);
+	int cpt = 0;
+	while (cpt < 3) {
+		update_ping_data(ping->params.data, ping);
+		if (sendto(ping->socks.send, ping->params.data, packet_size, 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr)) < 0) {
+			perror("Send failed");
+			return 1;
+		}
+		ping->pings = add_ping(ping->pings, ping->params.seq);
+		ping->params.seq++;
+		cpt++;
+	}
+	return 0;
+}
+
 int cmd_traceroute(ping *ping) {
 	while (g_run && ping->params.ttl <= ping->params.max_ttl) {
 		printf("%d : ", ping->params.ttl);
 		if (ping->params.type_traceroute == 0) {
-			printf("traceroute with udp\n");
-			return 0;
+			if (send_udp_pckt(ping) != 0)
+				return 0;
 		}
 		else if (ping->params.type_traceroute == 1) {
 			if (!g_run || send_pings(ping) != 0)
