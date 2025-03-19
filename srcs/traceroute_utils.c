@@ -1,6 +1,6 @@
 #include "../ft_traceroute.h"
 
-ping_pckt* add_ping(ping_pckt *head, u_int16_t seq_num) {
+ping_pckt* add_pckt(ping_pckt *head, u_int16_t seq_num) {
 	ping_pckt *new_node = (ping_pckt *)malloc(sizeof(ping_pckt));
 	if (!new_node)
 		return NULL;
@@ -15,7 +15,7 @@ ping_pckt* add_ping(ping_pckt *head, u_int16_t seq_num) {
 	return new_node;
 }
 
-ping_pckt* find_ping(ping_pckt *head, u_int16_t seq_num) {
+ping_pckt* find_pckt(ping_pckt *head, u_int16_t seq_num) {
 	ping_pckt *current = head;
 	while (current) {
 		if (current->seq == seq_num) {

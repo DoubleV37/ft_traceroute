@@ -65,14 +65,19 @@ int	cmd_help(void);
 int	cmd_version(void);
 
 // ping_utils.c
-ping_pckt*	add_ping(ping_pckt *head, u_int16_t seq_num);
-ping_pckt*	find_ping(ping_pckt *head, u_int16_t seq_num);
+ping_pckt*	add_pckt(ping_pckt *head, u_int16_t seq_num);
+ping_pckt*	find_pckt(ping_pckt *head, u_int16_t seq_num);
 void	free_ping(ping_pckt *head);
 double	time_diff(struct timeval start, struct timeval end);
 float	ft_sqrt(float number);
 unsigned	short checksum(void *b, int len);
 char *clean_argv(char *argv);
 void	initial_init_traceroute(ping *ping);
+
+// udp_utils.c
+int create_socket_send_udp(void);
+int recv_udp(ping *ping);
+int send_udp_pckt(ping *ping);
 
 // parsing.c
 int	parsing(int argc, char **argv);
