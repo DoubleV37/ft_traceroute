@@ -109,3 +109,17 @@ void initial_init_traceroute(ping *ping)
 	ping->params.ip_addr_dest[0] = '\0';
 	ping->params.type_traceroute = 0;
 }
+
+const char *reverse_dns_lookup(const char *ip) {
+    static char host[1024];
+    struct sockaddr_in sa;
+
+    sa.sin_family = AF_INET;
+    if (inet_pton(AF_INET, ip, &sa.sin_addr) <= 0) {
+        return ip;
+    }
+    if (getnameinfo((struct sockaddr *)&sa, sizeof(sa), host, sizeof(host), NULL, 0, NI_NAMEREQD) == 0) {
+        return host;
+    }
+    return ip;
+}

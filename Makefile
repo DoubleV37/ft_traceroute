@@ -8,7 +8,7 @@ SRC =	srcs/main.c \
 		srcs/parsing.c \
 		srcs/commands.c \
 		srcs/ping_utils.c \
-		srcs/udp_utils.c
+		srcs/udp_utils.c 
 
 RM = rm -rf
 

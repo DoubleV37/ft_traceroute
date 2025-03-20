@@ -114,11 +114,10 @@ int initial_setup_traceroute(ping *ping) {
 		ping->socks.send = create_socket_send_icmp();
 	}
 	else {
-		// ping->socks.recv = create_socket_recv_udp();
 		ping->socks.recv = create_socket_recv_icmp();
 		if (ping->socks.recv < 0)
 			return 1;
-		ping->socks.send = create_socket_send_udp();
+		ping->socks.send = create_socket_send_udp(&ping->params.tos);
 	}
 	if (ping->socks.send < 0) {
 		close(ping->socks.recv);

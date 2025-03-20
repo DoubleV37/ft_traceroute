@@ -49,6 +49,7 @@ typedef struct s_params{
 	char ip_addr_dest[16];
 	int ttl;
 	int max_ttl;
+	int tos;
 	struct s_ping_data *data;
 	u_int16_t seq;
 	int type_traceroute;
@@ -73,9 +74,10 @@ float	ft_sqrt(float number);
 unsigned	short checksum(void *b, int len);
 char *clean_argv(char *argv);
 void	initial_init_traceroute(ping *ping);
+const char *reverse_dns_lookup(const char *ip);
 
 // udp_utils.c
-int create_socket_send_udp(void);
+int create_socket_send_udp(int *tos);
 int recv_udp(ping *ping);
 int send_udp_pckt(ping *ping);
 

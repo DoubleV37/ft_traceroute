@@ -28,7 +28,7 @@ int recv_udp(ping *ping) {
 	struct icmphdr *icmp_reply;
 	struct sockaddr_in	src_addr;
 	struct udphdr *udp_hdr;
-	socklen_t		addr_len = sizeof(struct sockaddr_in);
+	socklen_t addr_len = sizeof(struct sockaddr_in);
 	int cnt = 0;
 	struct timeval tv;
 	ssize_t recv_len;
@@ -63,9 +63,8 @@ int recv_udp(ping *ping) {
 		type_reply = icmp_reply->type;
 		gettimeofday(&tv, NULL);
 		if (cnt == 0 || (last_ip != NULL && strcmp(last_ip, inet_ntoa(ip_hdr->ip_src)) != 0))
-			printf(" %s (%s)", inet_ntoa(ip_hdr->ip_src), inet_ntoa(ip_hdr->ip_src));
+			printf(" %s (%s)", reverse_dns_lookup(inet_ntoa(ip_hdr->ip_src)), inet_ntoa(ip_hdr->ip_src));
 		last_ip = inet_ntoa(ip_hdr->ip_src);
-		printf("\n== %s\n", inet_ntoa(ip_hdr->ip_src));
 		if (type_reply == ICMP_TIME_EXCEEDED || type_reply == ICMP_DEST_UNREACH) {
 			ip_hdr = (struct ip *)(recv_buffer + ip_hdr_len + icmp_hdr_len);
 			udp_hdr = (struct udphdr *)(recv_buffer + ip_hdr_len + icmp_hdr_len + sizeof(struct ip));
@@ -86,11 +85,15 @@ int recv_udp(ping *ping) {
 	return 0;
 }
 
-int create_socket_send_udp(void) {
+int create_socket_send_udp(int *tos) {
     int sock;
     sock = socket(AF_INET, SOCK_DGRAM, 0);
     if (sock < 0) {
         fprintf(stderr, "Socket error: %s\n", strerror(errno));
+        return -1;
+    }
+	if (setsockopt(sock, IPPROTO_IP, IP_TOS, tos, sizeof(*tos)) < 0) {
+        close(sock);
         return -1;
     }
     return sock;

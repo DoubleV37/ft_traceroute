@@ -32,7 +32,7 @@ ping_data *build_ping_data(ping *ping) {
 	memset(data, 0, packet_size);
     data->ip_hdr.ip_hl = 5;
     data->ip_hdr.ip_v = 4;
-    data->ip_hdr.ip_tos = 0;
+    data->ip_hdr.ip_tos = ping->params.tos;
     data->ip_hdr.ip_len = htons(packet_size);
     data->ip_hdr.ip_id = ping->params.id;
     data->ip_hdr.ip_off = 0;
@@ -128,7 +128,7 @@ int recv_pings(ping *ping) {
 		type_reply = icmp_reply->type;
 		gettimeofday(&tv, NULL);
 		if (cnt == 0 || (last_ip != NULL && strcmp(last_ip, inet_ntoa(ip_hdr->ip_src)) != 0))
-			printf(" %s (%s)", inet_ntoa(ip_hdr->ip_src), inet_ntoa(ip_hdr->ip_src));
+			printf(" %s (%s)", reverse_dns_lookup(inet_ntoa(ip_hdr->ip_src)), inet_ntoa(ip_hdr->ip_src));
 		last_ip = inet_ntoa(ip_hdr->ip_src);
 		if (type_reply == ICMP_TIME_EXCEEDED || type_reply == ICMP_ECHOREPLY) {
 			if (type_reply == ICMP_TIME_EXCEEDED) {

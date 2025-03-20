@@ -3,7 +3,6 @@
 int	cmd_help(void)
 {
 	printf("Usage: ft_traceroute [OPTION...] host\n");
-	printf("Send ICMP ECHO_REQUEST packets to network hosts.\n");
 	printf("\n");
 	printf("      --help     give this help list\n");
 	printf("  -V, --version  print program version\n");
