@@ -48,37 +48,6 @@ char	*get_source_ip() {
 	return (NULL);
 }
 
-int create_socket_recv_udp() {
-    int sock;
-    struct sockaddr_in server_addr;
-
-    sock = socket(AF_INET, SOCK_DGRAM, 0);
-    if (sock < 0) {
-        perror("socket error udp");
-        return -1;
-    }
-
-    memset(&server_addr, 0, sizeof(server_addr));
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_addr.s_addr = INADDR_ANY;
-    server_addr.sin_port = htons(33434);
-
-    if (bind(sock, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
-        perror("bind error");
-        close(sock);
-        return -1;
-    }
-    struct timeval timeout;
-    timeout.tv_sec = 3;
-    timeout.tv_usec = 0;
-    if (setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) < 0) {
-        perror("setsockopt error");
-        close(sock);
-        return -1;
-    }
-    return sock;
-}
-
 int	create_socket_recv_icmp()
 {
 	int	sock;

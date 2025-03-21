@@ -75,6 +75,8 @@ unsigned	short checksum(void *b, int len);
 char *clean_argv(char *argv);
 void	initial_init_traceroute(ping *ping);
 const char *reverse_dns_lookup(const char *ip);
+int ft_atoi(const char *str);
+int ft_strcmp(const char *s1, const char *s2);
 
 // udp_utils.c
 int create_socket_send_udp(int *tos);

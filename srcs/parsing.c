@@ -36,15 +36,15 @@ int parsing(int argc, char **argv)
 			i++;
 			continue;
 		}
-		else if (strcmp(argv[i], "--help") == 0) {
+		else if (ft_strcmp(argv[i], "--help") == 0) {
 			free(ping.params.raw_dest);
 			return (cmd_help());
 		}
-		else if (strcmp(argv[i], "-V") == 0 || strcmp(argv[i], "--version") == 0) {
+		else if (ft_strcmp(argv[i], "-V") == 0 || ft_strcmp(argv[i], "--version") == 0) {
 			free(ping.params.raw_dest);
 			return (cmd_version());
 		}
-		else if (strcmp(argv[i], "-I") == 0 || strcmp(argv[i], "--icmp") == 0) {
+		else if (ft_strcmp(argv[i], "-I") == 0 || ft_strcmp(argv[i], "--icmp") == 0) {
 			ping.params.type_traceroute = 1;
 			if (getgid() != 0) {
 				printf("You do not have enough privileges to use this traceroute method.\n");
@@ -52,7 +52,7 @@ int parsing(int argc, char **argv)
 				return (1);
 			}
 		}
-		else if (strcmp(argv[i], "-f") == 0 || strcmp(argv[i], "--first") == 0) {
+		else if (ft_strcmp(argv[i], "-f") == 0 || ft_strcmp(argv[i], "--first") == 0) {
 			if (i + 1 < argc) {
 				ping.params.ttl = atoi(argv[i + 1]);
 				i++;
@@ -67,9 +67,9 @@ int parsing(int argc, char **argv)
 				return (1);
 			}
 		}
-		else if (strcmp(argv[i], "-m") == 0 || strcmp(argv[i], "--max-hops") == 0) {
+		else if (ft_strcmp(argv[i], "-m") == 0 || ft_strcmp(argv[i], "--max-hops") == 0) {
 			if (i + 1 < argc) {
-				ping.params.max_ttl = atoi(argv[i + 1]);
+				ping.params.max_ttl = ft_atoi(argv[i + 1]);
 				i++;
 				if (verify_ttl(ping.params.max_ttl, 0)) {
 					free(ping.params.raw_dest);
@@ -82,9 +82,9 @@ int parsing(int argc, char **argv)
 				return (1);
 			}
 		}
-		else if (strcmp(argv[i], "-t") == 0 || strcmp(argv[i], "--tos") == 0) {
+		else if (ft_strcmp(argv[i], "-t") == 0 || ft_strcmp(argv[i], "--tos") == 0) {
 			if (i + 1 < argc) {
-				ping.params.tos = atoi(argv[i + 1]);
+				ping.params.tos = ft_atoi(argv[i + 1]);
 				i++;
 			}
 			else {

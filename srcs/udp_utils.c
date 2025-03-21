@@ -3,9 +3,8 @@
 int send_udp_pckt(ping *ping) {
 	setsockopt(ping->socks.send, IPPROTO_IP, IP_TTL, &ping->params.ttl, sizeof(int));
 	struct sockaddr_in dest_addr;
-	memset(&dest_addr, 0, sizeof(dest_addr));
 	dest_addr.sin_family = AF_INET;
-	dest_addr.sin_addr.s_addr = inet_addr(ping->params.ip_addr_dest);
+	inet_pton(AF_INET, ping->params.ip_addr_dest, &dest_addr.sin_addr);
 	dest_addr.sin_port = htons(ping->params.seq + 33434);
 	size_t packet_size = sizeof(ping_data);
 	int cnt = 0;

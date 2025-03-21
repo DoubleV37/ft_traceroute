@@ -58,6 +58,37 @@ float ft_sqrt(float number) {
 	return x;
 }
 
+int ft_atoi(const char *str) {
+	int sign = 1;
+	int result = 0;
+
+	while (*str == ' ' || (*str >= 9 && *str <= 13)) {
+		str++;
+	}
+	if (*str == '-' || *str == '+') {
+		if (*str == '-') {
+			sign = -1;
+		}
+		str++;
+	}
+	while (*str >= '0' && *str <= '9') {
+		result = result * 10 + (*str - '0');
+		str++;
+	}
+	return sign * result;
+}
+
+int ft_strcmp(const char *s1, const char *s2) {
+	while (*s1 && *s2) {
+		if (*s1 != *s2) {
+			return (unsigned char)*s1 - (unsigned char)*s2;
+		}
+		s1++;
+		s2++;
+	}
+	return (unsigned char)*s1 - (unsigned char)*s2;
+}
+
 unsigned short checksum(void *b, int len) {
 	unsigned short *buf = b;
 	unsigned int sum = 0;
@@ -108,6 +139,7 @@ void initial_init_traceroute(ping *ping)
 	ping->params.raw_dest = NULL;
 	ping->params.ip_addr_dest[0] = '\0';
 	ping->params.type_traceroute = 0;
+	ping->params.tos = 0;
 }
 
 const char *reverse_dns_lookup(const char *ip) {

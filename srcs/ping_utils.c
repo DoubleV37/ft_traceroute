@@ -19,9 +19,8 @@ int create_socket_send_icmp(void) {
 
 ping_data *build_ping_data(ping *ping) {
 	struct sockaddr_in dest_addr;
-	memset(&dest_addr, 0, sizeof(dest_addr));
 	dest_addr.sin_family = AF_INET;
-	dest_addr.sin_addr.s_addr = inet_addr(ping->params.ip_addr_dest);
+	inet_pton(AF_INET, ping->params.ip_addr_dest, &dest_addr.sin_addr);
 	size_t packet_size = sizeof(ping_data);
 	ping_data *data = (ping_data *)malloc(packet_size);
 	if (!data) {
@@ -38,7 +37,7 @@ ping_data *build_ping_data(ping *ping) {
     data->ip_hdr.ip_off = 0;
     data->ip_hdr.ip_ttl = ping->params.ttl;
     data->ip_hdr.ip_p = IPPROTO_ICMP;
-    data->ip_hdr.ip_src.s_addr = inet_addr(ping->params.ip_addr_src);
+	inet_pton(AF_INET, ping->params.ip_addr_src, &data->ip_hdr.ip_src);
     data->ip_hdr.ip_dst.s_addr = dest_addr.sin_addr.s_addr;
     data->ip_hdr.ip_sum = 0;
     data->ip_hdr.ip_sum = checksum((uint16_t *)&data->ip_hdr, sizeof(data->ip_hdr));
@@ -69,7 +68,7 @@ int send_pings(ping *ping) {
 	struct sockaddr_in dest_addr;
 	memset(&dest_addr, 0, sizeof(dest_addr));
 	dest_addr.sin_family = AF_INET;
-	dest_addr.sin_addr.s_addr = inet_addr(ping->params.ip_addr_dest);
+	inet_pton(AF_INET, ping->params.ip_addr_dest, &dest_addr.sin_addr);
     size_t packet_size = sizeof(ping_data);
 	int cnt = 0;
 	while (cnt < 3) {
@@ -127,7 +126,7 @@ int recv_pings(ping *ping) {
 		icmp_reply = (struct icmphdr *)(recv_buffer + ip_hdr_len);
 		type_reply = icmp_reply->type;
 		gettimeofday(&tv, NULL);
-		if (cnt == 0 || (last_ip != NULL && strcmp(last_ip, inet_ntoa(ip_hdr->ip_src)) != 0))
+		if (cnt == 0 || (last_ip != NULL && ft_strcmp(last_ip, inet_ntoa(ip_hdr->ip_src)) != 0))
 			printf(" %s (%s)", reverse_dns_lookup(inet_ntoa(ip_hdr->ip_src)), inet_ntoa(ip_hdr->ip_src));
 		last_ip = inet_ntoa(ip_hdr->ip_src);
 		if (type_reply == ICMP_TIME_EXCEEDED || type_reply == ICMP_ECHOREPLY) {

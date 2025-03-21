@@ -7,6 +7,9 @@ int	cmd_help(void)
 	printf("      --help     give this help list\n");
 	printf("  -V, --version  print program version\n");
 	printf("  -I, --icmp     use ICMP ECHO for tracerouting\n");
+	printf("  -m, --max-hops=N  set the maximum TTL, default value is 30\n");
+	printf("  -f, --first=N  set the first TTL, default value is 1\n");
+	printf("  -t, --tos=N     set the TOS (type of service)\n");
 	return (0);
 }
 
